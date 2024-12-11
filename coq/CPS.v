@@ -1,7 +1,7 @@
 (*! Language | Continuation-passing semantics and weakest precondition calculus !*)
 
 Require Import CompactSemantics.
-Require Import Magic.
+Require Coq.derive.Derive.
 
 Section CPS.
   Context {pos_t var_t fn_name_t rule_name_t reg_t ext_fn_t: Type}.
@@ -236,6 +236,21 @@ Section CPS.
                                   | Some (l, _, _) => k (Some l)
                                   | None => k None
                                   end) CtxEmpty log_empty.
+
+    Derive interp_action_cps1 SuchThat
+      (forall {sig tau}
+        (L: Log)
+        (a: action sig tau)
+        {A} (k: action_continuation A sig tau)
+        Gamma l,
+          interp_action_cps1 sig tau L a A k Gamma l =
+          @interp_action_cps sig tau L a A k Gamma l)
+      As interp_action_cps_eqn.
+    Proof.
+      subst interp_action_cps1;
+      instantiate (1 := ltac:(intros sig tau L a; destruct a)).
+      intros; destruct a; simpl; reflexivity.
+    Qed.
   End Action.
 
   Section Scheduler.
