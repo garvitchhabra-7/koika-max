@@ -490,7 +490,7 @@ End CPS.
 Arguments interp_action_cps
           {pos_t var_t fn_name_t reg_t ext_fn_t}
           {R Sigma} {REnv} r sigma
-          {sig tau} L !a / A k.
+          {sig tau} L !a / {A} k.
 
 Arguments interp_rule_cps
           {pos_t var_t fn_name_t reg_t ext_fn_t}

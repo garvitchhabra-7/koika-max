@@ -56,6 +56,11 @@ Ltac head expr :=
     | _ => expr
   end.
 
+Ltac head_constructor rule :=
+  let con := head rule in
+  is_constructor con + fail 0 con "is not a constructor".
+
+
 Ltac head_hnf expr := let expr' := eval hnf in expr in head expr'.
 
 Ltac rewrite_all_hypotheses :=

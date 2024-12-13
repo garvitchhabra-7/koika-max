@@ -140,14 +140,43 @@ Module Collatz_Test.
    * register value assingment of r (r0 set to 18)
    *)
   Goal
-    run_action r (rules divide)
-    (fun ctxt =>
-      let bits_r0 := ctxt.[r0] in
-      Bits.to_nat bits_r0 = 9
-    ).
+    assert Some(ctxt) := run_action r (rules divide) in
+    let bits_r0 := ctxt.[r0] in
+    Bits.to_nat bits_r0 = 9.
   Proof.
     check.
   Defined.
+
+
+
+
+  Instance reg_t_ft : FiniteType reg_t := _.
+
+  Arguments may_read _ _ _ /.
+  Example single_stepping :
+    assert Some ctxt := run_action r (rules divide) in
+    ctxt.nat[r0] = 9.
+  Proof.
+    koika_start.
+    - unfold rules.
+      simpl (extract_success _ _).
+      repeat koika_step.
+        vm_compute (Bits.single _); cbv match.
+      repeat koika_step.
+
+      koika_simpl.
+    - koika_simpl.
+      vm_compute.
+      reflexivity.
+  Qed.
+
+  Goal
+    assert Some ctxt1 := run_action r (rules divide) in
+    assert Some ctxt2 := run_action r (rules multiply) in
+    ctxt1.nat[r0] = 9 /\ ctxt2.nat[r0] = 9.
+  Proof.
+    koika_start.
+  Admitted.
 
   (*
    * This example checks the function times_three
@@ -163,17 +192,15 @@ Module Collatz_Test.
      *)
     let input := #{ ("bs", bits_t 16) => (Bits.of_nat 16 2) }# in
 
-    run_function r input func
-    (fun ctxt out =>
-      let r0 := Bits.to_nat ctxt.[r0] in
-      let out  := Bits.to_nat out in
-      
-      (*
-       * We expect that the output is 3 times or input
-       * and that the register value or r0 did not change
-       *)
-      r0 = 18 /\ out = 3 * 2
-    ).
+    assert Some(ctxt,out) := run_function r input func in
+    let r0 := Bits.to_nat ctxt.[r0] in
+    let out  := Bits.to_nat out in
+
+    (*
+      * We expect that the output is 3 times or input
+      * and that the register value or r0 did not change
+      *)
+    r0 = 18 /\ out = 3 * 2.
   Proof.
       check.
   Defined.
@@ -183,16 +210,25 @@ Module Collatz_Test.
    * cycle.
    *)
   Goal
-    run_schedule r rules empty_sigma collatz
-    (fun ctxt =>
-      let bits_r0 := ctxt.[r0]           in
-      let nat_r0  := Bits.to_nat bits_r0 in
-      
-      nat_r0 = (18/2)*3+1
-    ).
+    let ctxt := run_schedule r empty_sigma rules collatz in
+    let bits_r0 := ctxt.[r0]           in
+    let nat_r0  := Bits.to_nat bits_r0 in
+
+    nat_r0 = (18/2)*3+1.
   Proof.
     check.
   Defined.
+
+
+  (* single stepping *)
+  Goal
+    let ctxt := run_schedule_cs r empty_sigma rules collatz in
+    let bits_r0 := ctxt.[r0] in
+    let nat_r0 := Bits.to_nat bits_r0 in
+    nat_r0 = (18/2)*3+1.
+  Proof.
+    koika_start.
+    unfold run_schedule.
 
 End Collatz_Test.
 
