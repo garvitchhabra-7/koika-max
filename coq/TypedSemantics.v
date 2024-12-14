@@ -1,5 +1,6 @@
 (*! Language | Semantics of typed Kôika programs !*)
 Require Export Koika.Common Koika.Environments Koika.Logs Koika.Syntax Koika.TypedSyntax.
+Require Coq.derive.Derive.
 
 Section Interp.
   Context {pos_t var_t fn_name_t rule_name_t reg_t ext_fn_t: Type}.
@@ -118,6 +119,19 @@ Section Interp.
         interp_action Gamma sched_log action_log a
       end Gamma.
 
+    Derive interp_action1 SuchThat
+      (forall {sig tau}
+        {Gamma}
+        (slog alog: Log)
+        (a: action sig tau),
+          interp_action1 sig tau Gamma slog alog a =
+          @interp_action sig tau Gamma slog alog a)
+      As interp_action_eqn.
+    Proof.
+      subst interp_action1.
+      instantiate (1 := ltac:(intros sig tau Gamma slog alog a; destruct a)).
+      intros; destruct a; simpl; reflexivity.
+    Qed.
     Definition interp_rule (sched_log: Log) (rl: rule) : option Log :=
       match interp_action CtxEmpty sched_log log_empty rl with
       | Some (l, _, _) => Some l
