@@ -33,8 +33,8 @@
         devShells.default = self'.checks.koika;
 
         packages = {
-          default = self'.packages.coq8_18-koika;
-          coq8_18-koika = pkgs.coqPackages_8_18.koika;
+          default = self'.packages.coq8_19-koika;
+          coq8_19-koika = pkgs.coqPackages_8_19.koika;
           coqDev-koika = pkgs.coqPackages_koika.koika;
         };
 
