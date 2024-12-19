@@ -16,6 +16,7 @@ Module Internals.
 
   Ltac2 eval_simpl c :=
     Std.eval_simpl {
+        Std.rStrength := Norm;
         Std.rBeta := true;
         Std.rMatch := true;
         Std.rFix := true;
