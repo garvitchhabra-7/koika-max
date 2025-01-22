@@ -14,9 +14,13 @@ Module Internals.
 
   Ltac2 Type exn ::= [ NotAConstructor (constr) ].
 
+
+  (* rStrength is of type strength which is defined as:
+  Ltac2 Type strength := [ Norm | Head ].*)
+
   Ltac2 eval_simpl c :=
     Std.eval_simpl {
-        Std.rStrength := Norm;
+        Std.rStrength := Std.Norm;       
         Std.rBeta := true;
         Std.rMatch := true;
         Std.rFix := true;
